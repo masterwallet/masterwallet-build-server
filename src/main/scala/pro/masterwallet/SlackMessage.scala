@@ -2,7 +2,7 @@ import scalaj.http.{ Http, HttpResponse }
 import ujson._
 
 case class SlackMessage(attachments: Js.Arr) {
-  val channelUrl: String = Sys.env("SLACK_CHANNEL_URL")
+  val channelUrl: String = sys.env("SLACK_CHANNEL_URL")
 
   def send = {
     val data = ujson.write(Js.Obj("attachments" -> attachments))

@@ -1,7 +1,7 @@
 package pro.masterwallet
 
 import scala.concurrent.{ Await, ExecutionContext, Future }
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.util.{ Failure, Success }
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.Http
@@ -12,12 +12,19 @@ object BuilderServer extends App with BuilderRoutes {
 
   // set up ActorSystem and other dependencies here
   //#server-bootstrapping
-  implicit val system: ActorSystem = ActorSystem("builderAkkaHttpServer")
+  implicit val system: ActorSystem = ActorSystem("builderServer")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
   //#server-bootstrapping
 
+  val builderActor: ActorRef = system.actorOf(BuilderActor.props, "builderActor")
   lazy val routes: Route = builderRoutes
+
+  import system.dispatcher
+  system.scheduler.schedule(0.seconds, 5.seconds) {
+    builderActor ! BuilderActor.Queued
+  }
+  /*
 
   //#http-server
   val port = 8029;
@@ -32,4 +39,5 @@ object BuilderServer extends App with BuilderRoutes {
   }
   Await.result(system.whenTerminated, Duration.Inf)
   //#http-server
+*/
 }
