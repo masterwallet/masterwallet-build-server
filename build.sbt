@@ -14,6 +14,8 @@ lazy val root = (project in file(".")).
       "org.scalatest"     %% "scalatest"            % "3.0.5"         % Test,
 
       "org.scalaj"  %% "scalaj-http"    % "2.4.1",
-      "com.lihaoyi" %% "ujson"          % "0.6.6"
+      "com.lihaoyi" %% "ujson"          % "0.6.6",
+      "com.lihaoyi" %% "ammonite-ops"   % "1.1.0"
+//       "com.lihaoyi" %% "ammonite-shell" % "1.1.0-34-b991be4"
     )
   )

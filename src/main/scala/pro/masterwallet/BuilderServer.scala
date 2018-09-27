@@ -19,9 +19,7 @@ object BuilderServer extends App with BuilderRoutes {
 
   val builderActor: ActorRef = system.actorOf(BuilderActor.props, "builderActor")
   lazy val routes: Route = builderRoutes
-
-  import system.dispatcher
-  system.scheduler.schedule(0.seconds, 5.seconds) {
+  system.scheduler.schedule(0.seconds, 10.seconds) {
     builderActor ! BuilderActor.Queued
   }
   /*
