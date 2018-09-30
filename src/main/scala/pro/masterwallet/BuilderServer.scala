@@ -10,19 +10,18 @@ import akka.stream.ActorMaterializer
 
 object BuilderServer extends App with BuilderRoutes {
 
-  // set up ActorSystem and other dependencies here
+   // set up ActorSystem and other dependencies here
   //#server-bootstrapping
   implicit val system: ActorSystem = ActorSystem("builderServer")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
   //#server-bootstrapping
 
+  
   val builderActor: ActorRef = system.actorOf(BuilderActor.props, "builderActor")
   lazy val routes: Route = builderRoutes
-  //   system.scheduler.schedule(0.seconds, 300.minutes) {
-  builderActor ! BuilderActor.Queued
-  //  }
-  /*
+
+  println("Running builder server")
 
   //#http-server
   val port = 8029;
@@ -37,5 +36,4 @@ object BuilderServer extends App with BuilderRoutes {
   }
   Await.result(system.whenTerminated, Duration.Inf)
   //#http-server
-*/
 }
