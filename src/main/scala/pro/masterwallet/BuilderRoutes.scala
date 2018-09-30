@@ -31,7 +31,7 @@ trait BuilderRoutes {
   //#all-routes
   lazy val builderRoutes: Route =
     path("push") {
-      get {
+      post {
         val result = builderActor ? Queued
         println(result, result.getClass);
         complete(ujson.write(Js.Obj("result" -> "ok", "action" -> "pushed")))
