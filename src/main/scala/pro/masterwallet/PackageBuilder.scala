@@ -79,7 +79,6 @@ class PackageBuilder(val version: String) extends Thread {
 
   override def run = {
     implicit val wd = pwd
-    val mwwd = wd
     val startTime = LocalDateTime.now
 
     val defaultDistRoot = root / 'mnt / "dist.masterwallet.pro"
@@ -98,6 +97,7 @@ class PackageBuilder(val version: String) extends Thread {
       println("Folder created " + buildDir.toString)
       buildDir.mkdirs 
     }
+    val mwwd = Path(buildDir)
 
     println("Cloning 3 projects... RELEASE=" + envOrElse("RELEASE", ""))    
     gitClone("https://github.com/masterwallet/identity-server-js")
