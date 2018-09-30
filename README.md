@@ -4,8 +4,9 @@ enviroment properties to be defined:
 ```
 RELEASE=1
 SLACK_CHANNEL_URL=...
-CDN_FOLDER=...
-CDN_HTTP_ROOT=...
+BUILD_ROOT=/opt/builds
+DIST_ROOT=/mnt/dist.masterwallet.pro
+DIST_HTTP_ROOT=http://dist.masterwallet.pro
 ```
 
 run just the build without server

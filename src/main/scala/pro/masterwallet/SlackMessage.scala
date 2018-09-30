@@ -1,3 +1,5 @@
+package pro.masterwallet
+
 import scalaj.http.{ Http, HttpResponse }
 import ujson._
 

@@ -2,7 +2,12 @@ package pro.masterwallet
 
 import java.io.File
 import scala.sys.process._
-import java.util.concurrent._;
+import scala.util.Properties.envOrElse
+import ammonite.ops._
+import ujson._
+import java.util.concurrent._
+import java.time.temporal.ChronoUnit
+import java.time.LocalDateTime
 
 abstract class BuilderThread(
     latch: Option[CountDownLatch] = None, 
@@ -41,8 +46,7 @@ class DesktopDistributionThread(latch: CountDownLatch, buildDir: File, version: 
     println("Starting Desktop Thread")
     npm("install")
     npm("run dist")
-    // todo: copy distribution to CDN
-    // todo: send slack message
+    println("Finished Desktop Thread")
     done
   }
 }
@@ -74,13 +78,28 @@ class PackageBuilder(val version: String) extends Thread {
   }
 
   override def run = {
+    implicit val wd = pwd
+    val mwwd = wd
+    val startTime = LocalDateTime.now
+
+    val defaultDistRoot = root / 'mnt / "dist.masterwallet.pro"
+    val DIST_ROOT = if (!envOrElse("DIST_ROOT", "").isEmpty) Path(sys.env("DIST_ROOT")) else defaultDistRoot
+    if (!exists(DIST_ROOT)) {
+      throw new Exception("Missing distribution folder " + DIST_ROOT.toString)
+    }
+    val CHANNEL_URL:String = sys.env("SLACK_CHANNEL_URL")
+    if (CHANNEL_URL.isEmpty) {
+      throw new Exception("Missing SLACK_CHANNEL_URL in variables")
+    }
+    val DIST_HTTP_ROOT: String = envOrElse("DIST_HTTP_ROOT", "http://dist.masterwallet.pro")
+
     val buildDir = new File(buildRoot + "/" + version)
     if (!buildDir.exists) {
       println("Folder created " + buildDir.toString)
       buildDir.mkdirs 
     }
 
-    println("cloning 3 projects... ")    
+    println("Cloning 3 projects... RELEASE=" + envOrElse("RELEASE", ""))    
     gitClone("https://github.com/masterwallet/identity-server-js")
     gitClone("https://github.com/masterwallet/masterwallet-desktop")
     gitClone("https://github.com/masterwallet/identity-webclient")    
@@ -94,5 +113,23 @@ class PackageBuilder(val version: String) extends Thread {
     val stepDesktopBuild = new CountDownLatch(1);
     new DesktopDistributionThread(latch, buildDir, version).start
     stepDesktopBuild.await
+
+    println("Copying files to distribution")
+    %mv(mwwd / "masterwallet-desktop" / 'release, DIST_ROOT / version)
+    %rm("-rf", DIST_ROOT / version / "linux-unpacked" )
+    %rm("-rf", DIST_ROOT / version / "mac" )
+    %rm("-rf", DIST_ROOT / version / "win-unpacked" )
+    %rm("-rf", DIST_ROOT / version / "builder-effective-config.yaml" )
+    %rm("-rf", DIST_ROOT / version / "latest-mac.yml" )
+
+    // Send slack notification
+    val minutes = ChronoUnit.MINUTES.between(startTime, LocalDateTime.now)
+    val text = (ls! DIST_ROOT / version)
+      .filter(f => (f.toString.endsWith(".zip") || f.toString.endsWith(".exe")))
+      .map(f => (DIST_HTTP_ROOT + "/" + version + "/" + f.name))
+      .mkString("\n") + s"\nSpent: ${minutes} min"
+
+    println(SlackMessage(Js.Arr(Js.Obj("title" -> s"New Distribution ${version}", "text" -> text )))
+      .send)
   }
 }
