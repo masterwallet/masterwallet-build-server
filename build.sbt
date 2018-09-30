@@ -2,7 +2,7 @@ lazy val akkaHttpVersion = "10.1.4"
 lazy val akkaVersion    = "2.5.16"
 
 mainClass in (Compile, run) := Some("pro.masterwallet.BuilderServer")
-mainClass in (Compile, packageBin) := Some("pro.masterwallet.BuilderSErver")
+mainClass in (Compile, packageBin) := Some("pro.masterwallet.BuilderServer")
 
 
 lazy val root = (project in file(".")).
