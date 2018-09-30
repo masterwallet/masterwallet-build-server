@@ -111,7 +111,7 @@ class PackageBuilder(val version: String) extends Thread {
     println("Ready with webclient and server. Copied to desktop");
 
     val stepDesktopBuild = new CountDownLatch(1);
-    new DesktopDistributionThread(latch, buildDir, version).start
+    new DesktopDistributionThread(stepDesktopBuild, buildDir, version).start
     stepDesktopBuild.await
 
     println("Copying files to distribution")
