@@ -8,7 +8,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import scala.util.Properties.envOrElse
-
+import scala.sys.process._
 
 object BuilderServer extends App with BuilderRoutes {
 
@@ -24,6 +24,8 @@ object BuilderServer extends App with BuilderRoutes {
   lazy val routes: Route = builderRoutes
 
   println("Running builder server")
+  println("NPM: " + (Process("which npm").!!))
+  println("GIT: " + (Process("which git").!!))
 
   //#http-server
   val port = envOrElse("PORT", "8029").toInt

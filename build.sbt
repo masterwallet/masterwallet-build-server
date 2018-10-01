@@ -31,7 +31,13 @@ dockerfile in docker := {
   val artifactTargetPath = s"/app/${artifact.name}"
 
   new Dockerfile {
-    from("openjdk:8-jre")
+    from("openjdk:8-jre-alpine")
+    runRaw("apk update && apk upgrade")
+    runRaw("apk add git bash curl")
+
+    runRaw("apk add nodejs-current npm")
+    runRaw("npm install -g shelljs")
+
     add(artifact, artifactTargetPath)
 
     env("RELEASE", "1")
