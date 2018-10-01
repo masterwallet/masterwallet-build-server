@@ -131,5 +131,8 @@ class PackageBuilder(val version: String) extends Thread {
 
     println(SlackMessage(Js.Arr(Js.Obj("title" -> s"New Distribution ${version}", "text" -> text )))
       .send)
+
+    // Clean up
+    %rm("-rf", Path(buildDir.toString))
   }
 }
