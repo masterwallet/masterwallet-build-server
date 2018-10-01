@@ -24,8 +24,8 @@ object BuilderServer extends App with BuilderRoutes {
   lazy val routes: Route = builderRoutes
 
   println("Running builder server")
-  println("NPM: " + (Process("which npm").!!))
-  println("GIT: " + (Process("which git").!!))
+  println("NPM: " + (Process("which npm").!!).trim)
+  println("GIT: " + (Process("which git").!!).trim)
 
   //#http-server
   val port = envOrElse("PORT", "8029").toInt
