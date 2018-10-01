@@ -35,9 +35,14 @@ dockerfile in docker := {
     add(artifact, artifactTargetPath)
 
     env("RELEASE", "1")
+    env("SLACK_CHANNEL_URL", sys.env("SLACK_CHANNEL_URL"))
+    env("BUILD_ROOT", "/opt/builds")
+    env("DIST_ROOT", "/mnt/dist.masterwallet.pro")
+
     volume("/mnt/dist.masterwallet.pro", "/mnt/dist.masterwallet.pro")
-    run("mkdir", "/opt/builds")
+    volume("/opt/builds", "/opt/builds")
+
     expose(8029)
-    entryPoint("java", "-jar", artifactTargetPath)
+    entryPoint("java", "-Djava.net.preferIPv4Stack=true", "-jar", artifactTargetPath)
   }
 }

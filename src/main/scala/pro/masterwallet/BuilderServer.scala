@@ -7,6 +7,8 @@ import akka.actor.{ ActorRef, ActorSystem }
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
+import scala.util.Properties.envOrElse
+
 
 object BuilderServer extends App with BuilderRoutes {
 
@@ -24,10 +26,12 @@ object BuilderServer extends App with BuilderRoutes {
   println("Running builder server")
 
   //#http-server
-  val port = 8029;
-  val serverBinding: Future[Http.ServerBinding] = Http().bindAndHandle(routes, "127.0.0.1", port)
+  val port = envOrElse("PORT", "8029").toInt
+  val serverBinding: Future[Http.ServerBinding] = Http().bindAndHandle(routes, envOrElse("HOST", "0.0.0.0"), port)
   serverBinding.onComplete {
     case Success(bound) =>
+      val slackChannel = sys.env("SLACK_CHANNEL_URL")
+      println(s"Slack channel: ${slackChannel}")
       println(s"Server online at http://${bound.localAddress.getHostString}:${bound.localAddress.getPort}/")
     case Failure(e) =>
       Console.err.println(s"Server could not start!")
