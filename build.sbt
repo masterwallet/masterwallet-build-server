@@ -33,7 +33,7 @@ dockerfile in docker := {
   new Dockerfile {
     from("openjdk:8-jre-alpine")
     runRaw("apk update && apk upgrade")
-    runRaw("apk add git bash curl")
+    runRaw("apk add git bash curl python")
 
     runRaw("apk add nodejs-current npm")
     runRaw("npm install -g shelljs")
